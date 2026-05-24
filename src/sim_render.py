@@ -21,10 +21,12 @@ except ImportError:
 
 
 def _obstacle_patch(obstacle: Obstacle) -> patches.Polygon:
+    """Genera una rappresentazione poligonale (Artist) di un ostacolo per il rendering 2D."""
     return patches.Polygon(obstacle.vertices, closed=True, facecolor="lightgray", edgecolor="dimgray")
 
 
 def _add_static_map_elements(ax_map: plt.Axes, environment: Environment) -> None:
+    """Renderizza gli elementi statici dell'ambiente (Start point e Goal area)."""
     ax_map.add_patch(
         patches.Circle(environment.start, radius=cfg.ROBOT_RADIUS * 0.8, color="tab:blue", alpha=0.6, label="Start", zorder=10)
     )
@@ -36,13 +38,17 @@ def _add_static_map_elements(ax_map: plt.Axes, environment: Environment) -> None
 
 
 def _add_legend(fig: plt.Figure, path_line, reach_line, followed_line, heuristic_line, sensor_border, disc_plot, heading_line) -> None:
+    """
+    Costruisce e posiziona la legenda esplicativa per la decodifica dei simboli grafici.
+    Utilizza oggetti Patch per definire le chiavi di colore e oggetti Artist per le linee.
+    """
     fig.legend(
         [
             Patch(facecolor="tab:blue", edgecolor="black"),
             Patch(facecolor="tab:orange", edgecolor="black"),
             path_line,
             heading_line,
-            Patch(facecolor="cyan", edgecolor="black", alpha=0.5),  # <-- Quadratino celeste
+            Patch(facecolor="cyan", edgecolor="black", alpha=0.5),
             disc_plot,
             reach_line,
             followed_line,
@@ -70,19 +76,24 @@ def _add_legend(fig: plt.Figure, path_line, reach_line, followed_line, heuristic
 
 
 def setup_figure(environment: Environment, robot: Robot) -> SimulationArtists:
+    """
+    Inizializzazione dell'interfaccia grafica.
+    Configura il layout GridSpec, i subplot dedicati alla vista globale e al grafo 1D del LIDAR,
+    e istanzia gli oggetti grafici (Artists) manipolabili durante la simulazione.
+    """
     fig = plt.figure(figsize=(15, 8.5))
 
-    # Aumentato leggermente l'altezza della riga delle statistiche (da 0.2 a 0.25)
+    # GridSpec: layout bi-dimensionale per separare i grafici LIDAR dalle statistiche
     gs = fig.add_gridspec(2, 2, width_ratios=[1.4, 1.0], height_ratios=[1.2, 0.25])
 
-    # Subplot 1: Mappa Globale 2D (Riga 0, Colonna 0)
+    # Subplot 1: Vista Globale (mappa 2D dell'ambiente)
     ax_map = fig.add_subplot(gs[0, 0])
     ax_map.set_aspect("equal")
     ax_map.set_xlim(0, cfg.WIDTH)
     ax_map.set_ylim(0, cfg.HEIGHT)
     ax_map.set_title("Tangent Bug: Global 2D Environment")
 
-    # Subplot 2: Grafico LIDAR 1D (Riga 0, Colonna 1)
+    # Subplot 2: LIDAR Tangent Graph (Visuale 1D per analisi di discontinuità)
     ax_lidar_1d = fig.add_subplot(gs[0, 1])
     ax_lidar_1d.set_title("LIDAR Local Tangent Graph $L(\\theta)$")
     ax_lidar_1d.set_xlim(0, 360)
@@ -96,12 +107,11 @@ def setup_figure(environment: Environment, robot: Robot) -> SimulationArtists:
                                              label="Discontinuità $O_i$")
     ax_lidar_1d.legend(loc="upper right", fontsize=9)
 
-    # Subplot 3: Pannello Statistiche (Riga 1, esteso su entrambe le colonne)
+    # Subplot 3: Pannello Statistiche dinamiche
     ax_stats = fig.add_subplot(gs[1, :])
     ax_stats.axis("off")
 
-    # Il rettangolo di sfondo statico è stato rimosso.
-    # Al suo posto, usiamo un 'bbox' associato al testo che si adatta dinamicamente alla lunghezza del contenuto.
+    # Inserimento del testo con Bounding Box dinamico per adattamento automatico alle dimensioni della stringa
     stats_text = ax_stats.text(
         0.5, 0.5, "",
         transform=ax_stats.transAxes,
@@ -112,17 +122,16 @@ def setup_figure(environment: Environment, robot: Robot) -> SimulationArtists:
         bbox=dict(boxstyle="round,pad=0.8", facecolor="#f0f0f0", edgecolor="black", linewidth=1.5)
     )
 
-    # Disegno degli elementi statici della mappa (Start, Goal, Ostacoli)
+    # Inizializzazione entità statiche e dinamiche
     _add_static_map_elements(ax_map, environment)
     for obstacle in environment.obstacles:
         ax_map.add_patch(_obstacle_patch(obstacle))
 
-    # Elementi grafici per la modalità Ghost/Snapshot
     ghost_scatter, = ax_map.plot([], [], "o", color="purple", alpha=0.4, markersize=6, zorder=12)
     active_ghost, = ax_map.plot([], [], "o", markeredgecolor="red", markerfacecolor="none", markeredgewidth=2,
                                 markersize=14, zorder=14)
 
-    # Elementi dinamici del Robot e dei Sensori
+    # Rendering dinamico del robot (geometria polare/cerchio)
     robot_patch = patches.Circle(robot.position, radius=0.15, facecolor="tab:blue", edgecolor="black", zorder=50)
     ax_map.add_patch(robot_patch)
     path_line, = ax_map.plot([], [], "-", linewidth=1.5, color="tab:blue", alpha=0.6, zorder=5)
@@ -130,27 +139,24 @@ def setup_figure(environment: Environment, robot: Robot) -> SimulationArtists:
     sensor_rays = [ax_map.plot([], [], color="cyan", linewidth=0.2, alpha=0.6, zorder=4)[0] for _ in
                    range(cfg.LIDAR_NUM_RAYS)]
 
-    # Aura interna del sensore (trasparente)
+    # Rendering del raggio di scansione (LIDAR range)
     sensor_circle = patches.Circle(robot.position, radius=robot.robot_radius, facecolor="cyan", alpha=0.1, zorder=3)
     ax_map.add_patch(sensor_circle)
 
-    # Bordo esterno tratteggiato del raggio d'azione
     sensor_border = patches.Circle(robot.position, radius=robot.robot_radius, edgecolor="cyan", ls="--", fill=False,
                                    lw=1.5, alpha=0.6, zorder=4)
     ax_map.add_patch(sensor_border)
 
-    # Linee di puntamento e punti di discontinuità sulla mappa 2D
+    # Visualizzazione delle componenti Tangent Bug (Euristica, d_reach, d_followed)
     reach_line, = ax_map.plot([], [], ":", color="red", linewidth=1.5, alpha=0.8, zorder=21)
     followed_line, = ax_map.plot([], [], ":", color="blue", linewidth=1.5, alpha=0.8, zorder=21)
     heuristic_line, = ax_map.plot([], [], "--", color="darkorange", linewidth=2.5, alpha=1.0, zorder=30)
     disc_plot, = ax_map.plot([], [], "rx", markersize=5, zorder=20)
 
-    # Testo dello stato corrente in basso a destra del grafico 2D
+    # Indicatore di stato comportamentale attivo
     behavior_text = ax_map.text(0.98, 0.02, "", transform=ax_map.text(0, 0, "").get_transform() if not hasattr(ax_map,
                                                                                                                'transAxes') else ax_map.transAxes,
                                 ha="right", bbox=dict(facecolor="white", alpha=0.8, edgecolor="black"), zorder=25)
-
-    # Configurazione finale della legenda e del layout della finestra
 
     _add_legend(fig, path_line, reach_line, followed_line, heuristic_line, sensor_border, disc_plot, heading_line)
     plt.tight_layout(rect=[0.12, 0, 1, 0.96])
@@ -181,12 +187,11 @@ def setup_figure(environment: Environment, robot: Robot) -> SimulationArtists:
 
 
 def update_robot_artists(artists: SimulationArtists, robot: Robot) -> None:
-    # 1. Posizione del pallino fisso
+    """Aggiorna le coordinate e gli attributi visivi del modello del robot ad ogni step."""
     artists.robot_patch.set_center(robot.position)
     artists.robot_patch.set_facecolor("tab:blue" if robot.current_behavior == "move_to_goal" else "tab:orange")
     artists.robot_patch.set_visible(True)
     artists.robot_patch.set_zorder(100)
-
 
     artists.sensor_circle.set_radius(robot.robot_radius)
     artists.sensor_circle.set_center(robot.position)
@@ -202,6 +207,7 @@ def update_robot_artists(artists: SimulationArtists, robot: Robot) -> None:
 
 
 def _update_sensor_rays(sensor_rays: List[plt.Line2D], old_position: Point, dap: List[RaySample]) -> None:
+    """Aggiorna il raggio vettoriale di scansione LIDAR per la visualizzazione."""
     for ray_artist, (angle_deg, distance, point, _) in zip(sensor_rays, dap):
         target = point if point is not None else (
             old_position[0] + distance * math.cos(math.radians(angle_deg)),
@@ -211,6 +217,7 @@ def _update_sensor_rays(sensor_rays: List[plt.Line2D], old_position: Point, dap:
 
 
 def _update_reach_visuals(artists: SimulationArtists, robot: Robot, old_position: Point) -> None:
+    """Aggiorna le linee analitiche del Tangent Bug (euristiche e nodi di fuga)."""
     if robot.best_reach_node:
         artists.heuristic_line.set_data([old_position[0], robot.best_reach_node[0]], [old_position[1], robot.best_reach_node[1]])
         if robot.current_behavior == "boundary_following":
@@ -228,6 +235,7 @@ def _update_reach_visuals(artists: SimulationArtists, robot: Robot, old_position
 
 
 def _update_discontinuity_visuals(artists: SimulationArtists, old_position: Point, dap: List[RaySample], dps: List[Point]) -> None:
+    """Aggiorna la visualizzazione del grafo 1D del LIDAR e la proiezione delle discontinuità."""
     if dps:
         artists.disc_plot.set_data([point[0] for point in dps], [point[1] for point in dps])
     else:
@@ -253,24 +261,26 @@ def update_snapshot_artists(
         dap: List[RaySample],
         dps: List[Point],
 ) -> None:
-    # Rimuovendo le righe che aggiornano ghost_scatter e active_ghost,
-    # i pallini (ghost) non verranno più disegnati.
-
+    """Funzione gateway per l'aggiornamento sincronizzato di tutti i layer grafici ad ogni step temporale."""
     _update_sensor_rays(artists.sensor_rays, old_position, dap)
     _update_reach_visuals(artists, robot, old_position)
     _update_discontinuity_visuals(artists, old_position, dap, dps)
 
+
 def _total_path_length(path: List[Point]) -> float:
+    """Calcola la lunghezza totale cumulativa della traiettoria percorsa dall'agente."""
     if len(path) < 2:
         return 0.0
     return sum(math.dist(path[idx], path[idx + 1]) for idx in range(len(path) - 1))
 
 
 def _format_metric(value: float) -> str:
+    """Formatta i valori metrici con troncamento decimale per la visualizzazione a cruscotto."""
     return f"{value:.2f}" if value != float("inf") else "INF"
 
 
 def current_heuristic_from_robot(robot: Robot, dap: List[RaySample], dps: List[Point]) -> float:
+    """Interfaccia di estrazione del valore euristico corrente dal payload del robot."""
     if hasattr(robot, "_select_reach_target"):
         _, heuristic, _ = robot._select_reach_target(dap, dps)
         return heuristic
@@ -282,6 +292,10 @@ def current_heuristic_from_robot(robot: Robot, dap: List[RaySample], dps: List[P
 
 def update_stats_text(artists: SimulationArtists, robot: Robot, step: int, current_heuristic: float,
                       previous_heuristic: float) -> float:
+    """
+    Gestisce l'output testuale delle metriche di simulazione.
+    Esegue il formattaggio delle stringhe e la gestione del Layout dinamico tramite il Bounding Box.
+    """
     total_distance = _total_path_length(robot.path)
     reach_str = _format_metric(robot.d_reach)
     follow_str = _format_metric(robot.d_followed)
@@ -291,14 +305,11 @@ def update_stats_text(artists: SimulationArtists, robot: Robot, step: int, curre
     delta_heuristic = current_heuristic - previous_heuristic if all(
         math.isfinite(value) for value in (current_heuristic, previous_heuristic)) else float("inf")
 
-
-    # --- LOGICA DEL COLORE PER DELTA_H ---
+    # Gestione del color encoding del delta_h
     if math.isfinite(delta_heuristic):
-        # Rimane testo normale, compatibile con tutte le versioni di Matplotlib
         delta_heuristic_str = f"{delta_heuristic:+.3f}"
     else:
         delta_heuristic_str = "N/A"
-    # ---------------------------------------
 
     exit_condition = ""
     if robot.current_behavior == "boundary_following" and robot.d_followed != float("inf"):
@@ -306,7 +317,7 @@ def update_stats_text(artists: SimulationArtists, robot: Robot, step: int, curre
 
     artists.behavior_text.set_text(f"Step: {step} | State: {robot.current_behavior.upper()}")
 
-    # Dividiamo il testo in due righe ordinate
+    # Composizione del layout testuale su due righe per garantire la leggibilità
     line1 = "   |   ".join([
         f"h_curr : {heuristic_str}",
         f"h_min : {previous_heuristic_str}",
@@ -319,7 +330,6 @@ def update_stats_text(artists: SimulationArtists, robot: Robot, step: int, curre
         f"Distanza: {total_distance:.2f}"
     ]) + exit_condition
 
-    # Aggiorniamo il testo mandandolo a capo (\n)
     artists.stats_text.set_text(f"{line1}\n{line2}")
 
     return total_distance
