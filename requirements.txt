@@ -1,4 +1,10 @@
-numpy
-matplotlib
-shapely
-pygame
+# Dipendenze per la simulazione del Tangent Bug
+
+# Motore matematico e vettoriale
+numpy>=1.24.0
+
+# Rendering grafico dell'ambiente e dei grafici 1D
+matplotlib>=3.7.0
+
+# Manipolazione e salvataggio dei frame in formato GIF
+Pillow>=9.0.0

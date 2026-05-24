@@ -1,60 +1,32 @@
+# Simulazione Navigazione Autonoma: Tangent Bug
 
+Questo progetto implementa un ambiente di simulazione 2D per l'algoritmo di navigazione reattiva **Tangent Bug**. Il sistema modella un agente autonomo (robot) equipaggiato con un sensore LIDAR simulato a 360°, incaricato di raggiungere un obiettivo (Goal) navigando in un ambiente con ostacoli generati proceduralmente.
 
-# Tangent Bug Algorithm: Implementation and Lidar Simulation
+## Caratteristiche Principali
 
-Questo repository contiene un'implementazione in Python dell'algoritmo di navigazione Tangent Bug, applicato a un robot puntiforme che opera in ambienti 2D complessi. Il progetto include una simulazione realistica di un sensore Lidar a risoluzione finita e un'analisi comparativa delle prestazioni al variare dei parametri cinematici e di scansione.
+* **Macchina a Stati Finiti (FSM):** Il robot alterna in modo autonomo due comportamenti principali:
+  * *Motion-to-Goal*: Navigazione a gradiente basata sull'euristica visiva locale.
+  * *Boundary-Following*: Aggiramento del perimetro degli ostacoli per uscire dai minimi locali (trappole spaziali).
+* **Generazione Procedurale:** La mappa (ostacoli concavi, convessi e poligonali) viene generata dinamicamente ad ogni avvio tramite tecniche di Reject Sampling, garantendo sempre la presenza di un percorso valido.
+* **Sensore LIDAR Simulato:** Raycasting analitico per l'individuazione di ostacoli e punti di discontinuità (jump edges).
+* **Rendering in Tempo Reale:** L'interfaccia, sviluppata con `matplotlib`, mostra la mappa 2D globale, il grafo di tangenza locale 1D (Local Tangent Graph) e un cruscotto telemetrico con metriche di navigazione (distanze ed euristiche).
+* **Esportazione Automatica:** Alla conclusione della prova con successo, il sistema salva automaticamente una GIF animata della traiettoria nella cartella `media/`.
 
-## Descrizione del Progetto
+## Struttura del Progetto
 
-L'obiettivo è guidare un agente robotico verso un target evitando ostacoli poligonali (anche non convessi) utilizzando la libreria shapely per la gestione delle collisioni e della geometria.
+* `main.py`: Entry point dell'applicazione.
+* `config.py`: Parametri centralizzati (dimensioni mappa, tolleranze, setup sensori).
+* `simulation.py`: Orchestratore principale del loop temporale (percezione-decisione-azione).
+* `robot.py`: Logica di controllo, FSM e calcolo cinematico dell'agente.
+* `worldgen.py`: Factory procedurale per la generazione della mappa e degli ostacoli.
+* `geometry.py`: Primitive matematiche, algebra vettoriale e algoritmi di collision detection (Narrow & Broad phase).
+* `sim_render.py` & `sim_playback.py`: Moduli per il rendering Matplotlib e I/O per il salvataggio GIF.
+* `sim_types.py`: Strutture dati (Data Classes) per l'incapsulamento dello stato di simulazione.
 
-Sia $q$ la posizione attuale del robot e $q_{goal}$ la posizione del target. Definiamo $V$ l'insieme dei punti rilevati dal sensore entro il raggio $R$. Per ogni punto di continuità $O_i$ rilevato sull'ostacolo, la distanza stimata verso il goal attraverso $O_i$ è definita come:
+## Installazione
 
-$$
-d(q, q_{goal}) = \|q - O_i\| + \|O_i - q_{goal}\|
-$$
+Si consiglia di utilizzare un ambiente virtuale (`venv` o `conda`). Per installare le dipendenze necessarie, esegui:
 
-Il robot sceglie la direzione che minimizza questa funzione:
-
-$$
-i^* = \arg\min_{i} \left( \|q - O_i\| + \|O_i - q_{goal}\| \right)
-$$
-
-L'algoritmo prevede l'alternarsi di due comportamenti:
-
- 1. Comportamento 1 (Motion-to-Goal)
-Il robot si muove in linea retta verso il punto $O_{i^*}$ che minimizza l'euristica, a patto che:
-
-$$
-d_{min}(t) < d_{reached}
-$$
-
-dove $d_{min}$ è la distanza minima mai registrata tra l'ostacolo e il goal, e $d_{reached}$ è la distanza attuale.
-
- 2. Comportamento 2 (Boundary Following)
-Viene attivato quando il robot rileva un minimo locale della funzione distanza. In questa fase, il robot segue il bordo dell'ostacolo mantenendo una distanza di sicurezza, finché non viene soddisfatta la condizione di distacco:
-
-$$
-d_{leave} < d_{min}
-$$
-
-dove $d_{leave}$ è la distanza tra il punto di uscita potenziale e il goal.
-
----
-
-### Caratteristiche principali
-
-* Sensore Lidar realistico: Simulazione di un raggio di visione ($R$) e di una risoluzione angolare finita ($\Delta\theta$).
-* Gestione Ostacoli: Supporto per geometrie complesse e non convesse (Libreria shapely).
-* Visualizzazione Dinamica: Generazione automatica di GIF/MP4 che mostrano il raggio d'azione del sensore, i punti di discontinuità rilevati e lo stato del comportamento attuale.
-
----
-
-## Requisiti e Installazione
-
-Il progetto richiede Python 3.x e le seguenti librerie:
-
-* shapely
-* numpy
-* matplotlib
+```bash
+pip install -r requirements.txt
 

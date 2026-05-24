@@ -1,0 +1,13 @@
+# Cartelle IDE e configurazioni locali
+.idea/
+.venv/
+venv/
+env/
+__pycache__/
+
+# Log e file temporanei di prova
+prova_counter.txt
+media/
+
+# File di sistema
+.DS_Store
