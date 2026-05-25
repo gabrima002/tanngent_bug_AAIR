@@ -6,12 +6,10 @@ from typing import List, Sequence
 
 import config as cfg
 
-try:
-    from .geometry import Obstacle, Point
-    from .sim_types import Environment
-except ImportError:
-    from geometry import Obstacle, Point
-    from sim_types import Environment
+
+from src.geometry import Obstacle, Point
+from src.sim_types import Environment
+
 
 
 # =====================================================================

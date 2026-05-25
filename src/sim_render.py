@@ -10,14 +10,10 @@ from matplotlib.patches import Patch
 
 import config as cfg
 
-try:
-    from .geometry import Obstacle, Point
-    from .robot import Robot
-    from .sim_types import Environment, RaySample, SimulationArtists, SnapshotState
-except ImportError:
-    from geometry import Obstacle, Point
-    from robot import Robot
-    from sim_types import Environment, RaySample, SimulationArtists, SnapshotState
+from src.geometry import Obstacle, Point
+from src.robot import Robot
+from src.sim_types import Environment, RaySample, SimulationArtists, SnapshotState
+
 
 
 def _obstacle_patch(obstacle: Obstacle) -> patches.Polygon:

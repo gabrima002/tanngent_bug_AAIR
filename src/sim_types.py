@@ -6,11 +6,7 @@ from typing import Any, List, Optional, Tuple
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 from PIL import Image
-
-try:
-    from .geometry import Obstacle, Point
-except ImportError:
-    from geometry import Obstacle, Point
+from src.geometry import Obstacle, Point
 
 # Definizione del tipo astratto per il singolo campionamento del sensore LIDAR.
 # Struttura della tupla: (angolo_campionamento, distanza_rilevata, coordinate_impatto, riferimento_ostacolo)

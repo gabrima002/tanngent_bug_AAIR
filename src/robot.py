@@ -3,10 +3,7 @@ from typing import List, Optional, Tuple
 import numpy as np
 import config as cfg
 
-try:
-    from .geometry import Obstacle
-except ImportError:
-    from geometry import Obstacle
+from src.geometry import Obstacle
 
 
 class Robot:

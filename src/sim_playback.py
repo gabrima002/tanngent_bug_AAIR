@@ -9,10 +9,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import config as cfg
 
-try:
-    from .sim_types import SimulationArtists, SnapshotState
-except ImportError:
-    from sim_types import SimulationArtists, SnapshotState
+from src.sim_types import SimulationArtists, SnapshotState
+
 
 
 def save_frame(fig: plt.Figure, frames: List[Image.Image]) -> None:
