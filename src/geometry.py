@@ -11,7 +11,7 @@ Point = Tuple[float, float]
 # =====================================================================
 
 def _dot(a: Point, b: Point) -> float:
-    """Calcola il prodotto scalare (dot product) nello spazio euclideo bidimensionale."""
+    """Calcola il prodotto scalare nello spazio euclideo bidimensionale."""
     return a[0] * b[0] + a[1] * b[1]
 
 
@@ -23,8 +23,7 @@ def _sub(a: Point, b: Point) -> Point:
 def _cross(a: Point, b: Point) -> float:
     """
     Calcola il determinante della matrice 2x2 formata dai due vettori.
-    Equivale al modulo del prodotto vettoriale (cross product) o operatore wedge in 2D.
-    Fondamentale per i test di chiralità e intersezione.
+    Equivale al modulo del prodotto vettoriale.
     """
     return a[0] * b[1] - a[1] * b[0]
 
@@ -106,11 +105,9 @@ def _segments_intersect(a1: Point, a2: Point, b1: Point, b2: Point) -> bool:
     o3 = _orientation(b1, b2, a1)
     o4 = _orientation(b1, b2, a2)
 
-    # Intersezione Propria: i vertici di ciascun segmento giacciono su semipiani opposti
     if o1 * o2 < -eps and o3 * o4 < -eps:
         return True
 
-    # Intersezioni Improprie: gestione dei casi limite di collinearità spaziale
     if abs(o1) <= eps and _on_segment(b1, a1, a2):
         return True
     if abs(o2) <= eps and _on_segment(b2, a1, a2):
