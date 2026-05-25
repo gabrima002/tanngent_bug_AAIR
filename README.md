@@ -14,7 +14,7 @@ Tutti i parametri della simulazione (grandezza del robot, raggio del sensore, nu
 * **Grafica in Tempo Reale:** L'interfaccia mostra la mappa 2D, la visuale del sensore e un pannello con tutti i dati in tempo reale (distanze, stato attuale del robot).
 * **Esportazione Automatica:** Alla conclusione della prova con successo, il sistema salva automaticamente una GIF animata della traiettoria nella cartella `media/`.
 
-## Pseudo-codice dell'Algoritmo
+# Pseudo-codice dell'Algoritmo
 
 ## 1. Ripetere il comportamento 1: movimento verso il goal
 
@@ -38,6 +38,7 @@ Tutti i parametri della simulazione (grandezza del robot, raggio del sensore, nu
 * il goal viene raggiunto; oppure
 * viene completato un ciclo completo (il goal è irraggiungibile); oppure
 * ((d_{\text{reach}} < d_{\text{followed}})).
+
 
 ## Struttura del Progetto
 
