@@ -21,8 +21,6 @@ from worldgen import create_environment
 
 def run_simulation() -> None:
     """
-    Orchestratore principale della simulazione dell'algoritmo Tangent Bug.
-
     Questa funzione gestisce l'intero ciclo di vita della simulazione:
     1. Inizializzazione dell'ambiente (mappa, ostacoli, start, goal).
     2. Istanziazione dell'agente (Robot) e dell'interfaccia grafica (Matplotlib).
@@ -80,7 +78,7 @@ def run_simulation() -> None:
         old_position = robot.position
 
         # --- FASE 2.1: PERCEZIONE (SENSE) ---
-        # Il robot interroga l'ambiente circostante simulando un sensore LIDAR a 360°.
+        # Il robot interroga l'ambiente circostante simulando un sensore LIDAR a X° in base a quanto impostato in config.py.
         # dap: Distances and Angles Profile (array di distanze lette).
         # dps: Discontinuity Points (spigoli/angoli individuati dal sensore).
         dap, dps = robot.sense_environment(environment.obstacles)
