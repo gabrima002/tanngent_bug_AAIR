@@ -6,17 +6,17 @@ import random
 import matplotlib.pyplot as plt
 import config as cfg
 
-from robot import Robot
-from sim_playback import finalize_status, save_frame, write_gif
-from sim_render import (
+from src.robot import Robot
+from src.sim_playback import finalize_status, save_frame, write_gif
+from src.sim_render import (
     current_heuristic_from_robot,
     setup_figure,
     update_robot_artists,
     update_snapshot_artists,
     update_stats_text,
 )
-from sim_types import SnapshotState
-from worldgen import create_environment
+from src.sim_types import SnapshotState
+from src.worldgen import create_environment
 
 
 def run_simulation() -> None:
