@@ -1,6 +1,6 @@
 # Simulazione Navigazione Autonoma: Tangent Bug
 
-Questo progetto implementa un ambiente di simulazione 2D per l'algoritmo di navigazione **Tangent Bug**. Il sistema modella un robot dotato di un sensore (simile a un LIDAR a 360°) incaricato di raggiungere un obiettivo (Goal) navigando in un ambiente pieno di ostacoli generati casualmente.
+Questo progetto implementa un ambiente di simulazione 2D per l'algoritmo di navigazione **Tangent Bug**. Il sistema modella un robot dotato di un sensore (simile a un LIDAR) incaricato di raggiungere un obiettivo (Goal) navigando in un ambiente pieno di ostacoli generati casualmente.
 
 Tutti i parametri della simulazione (grandezza del robot, raggio del sensore, numero di ostacoli, velocità, ecc.) sono **completamente configurabili** in modo semplice tramite il file `config.py`.
 
@@ -16,24 +16,28 @@ Tutti i parametri della simulazione (grandezza del robot, raggio del sensore, nu
 
 ## Pseudo-codice dell'Algoritmo
 
-Il comportamento del robot si basa su queste regole formali:
+## 1. Ripetere il comportamento 1: movimento verso il goal
 
-**1. Repeat** behavior 1: move-to-goal
-* a. compute discontinuity points $O_k$
-* b. move to goal, if reachable, or to the discontinuity point with minimal heuristic distance $h_k(q)$
+1. Calcolare i punti di discontinuità ((O_k)).
+2. Muoversi verso il goal, se raggiungibile; altrimenti dirigersi verso il punto di discontinuità con distanza euristica minima ((h_k(q))).
 
-**until**
-* a. goal is reached, or
-* b. minimal heuristic distance $h_k(q)$ begins to increase
+**Finché non si verifica una delle seguenti condizioni:**
 
-**2. Repeat** behavior 2: boundary following
-* a. compute discontinuity points $O_k$ and distances $d_{\text{reach}}$, $d_{\text{followed}}$
-* b. follow boundary continuing in same direction as before
+* il goal viene raggiunto; oppure
+* la distanza euristica minima ((h_k(q))) inizia ad aumentare.
 
-**until**
-* a. goal is reached, or
-* b. a complete cycle is performed (goal is unreachable), or
-* c. $d_{\text{reach}} < d_{\text{followed}}$
+---
+
+## 2. Ripetere il comportamento 2: inseguimento del bordo
+
+1. Calcolare i punti di discontinuità ((O_k)) e le distanze ((d_{\text{reach}})) e ((d_{\text{followed}})).
+2. Seguire il bordo mantenendo la stessa direzione di percorrenza adottata in precedenza.
+
+**Finché non si verifica una delle seguenti condizioni:**
+
+* il goal viene raggiunto; oppure
+* viene completato un ciclo completo (il goal è irraggiungibile); oppure
+* ((d_{\text{reach}} < d_{\text{followed}})).
 
 ## Struttura del Progetto
 
