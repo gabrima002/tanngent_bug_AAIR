@@ -14,30 +14,28 @@ Tutti i parametri della simulazione (grandezza del robot, raggio del sensore, nu
 * **Grafica in Tempo Reale:** L'interfaccia mostra la mappa 2D, la visuale del sensore e un pannello con tutti i dati in tempo reale (distanze, stato attuale del robot).
 * **Esportazione Automatica:** Alla conclusione della prova con successo, il sistema salva automaticamente una GIF animata della traiettoria nella cartella `media/`.
 
-# Pseudo-codice dell'Algoritmo
+## Pseudo-codice dell'Algoritmo
 
-## Ripetere il comportamento 1: movimento verso il goal
+**Ripetere il comportamento 1: movimento verso il goal**
 
-1. Calcolare i punti di discontinuità ((O_k)).
-2. Muoversi verso il goal, se raggiungibile; altrimenti dirigersi verso il punto di discontinuità con distanza euristica minima ((h_k(q))).
+1. Calcolare i punti di discontinuità $O_k$.
+2. Muoversi verso il goal, se raggiungibile; altrimenti dirigersi verso il punto di discontinuità con distanza euristica minima $h_k(q)$.
 
-**Finché non si verifica una delle seguenti condizioni:**
-
+*Finché non si verifica una delle seguenti condizioni:*
 * il goal viene raggiunto; oppure
-* la distanza euristica minima ((h_k(q))) inizia ad aumentare.
+* la distanza euristica minima $h_k(q)$ inizia ad aumentare.
 
 ---
 
-## Ripetere il comportamento 2: inseguimento del bordo
+**Ripetere il comportamento 2: inseguimento del bordo (boundary following)**
 
-1. Calcolare i punti di discontinuità ((O_k)) e le distanze ((d_{\text{reach}})) e ((d_{\text{followed}})).
+1. Calcolare i punti di discontinuità $O_k$ e le distanze $d_{\text{reach}}$ e $d_{\text{followed}}$.
 2. Seguire il bordo mantenendo la stessa direzione di percorrenza adottata in precedenza.
 
-**Finché non si verifica una delle seguenti condizioni:**
-
+*Finché non si verifica una delle seguenti condizioni:*
 * il goal viene raggiunto; oppure
 * viene completato un ciclo completo (il goal è irraggiungibile); oppure
-* ((d_{\text{reach}} < d_{\text{followed}})).
+* $d_{\text{reach}} < d_{\text{followed}}$.
 
 
 ## Struttura del Progetto
