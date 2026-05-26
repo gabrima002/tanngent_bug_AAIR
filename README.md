@@ -16,7 +16,7 @@ Tutti i parametri della simulazione (grandezza del robot, raggio del sensore, nu
 
 ## Pseudo-codice dell'Algoritmo
 
-**Ripetere il comportamento 1: movimento verso il goal**
+**Ripetere il comportamento 1: move to goal**
 
 1. Calcolare i punti di discontinuità $O_k$.
 2. Muoversi verso il goal, se raggiungibile; altrimenti dirigersi verso il punto di discontinuità con distanza euristica minima $h_k(q)$.
@@ -27,7 +27,7 @@ Tutti i parametri della simulazione (grandezza del robot, raggio del sensore, nu
 
 ---
 
-**Ripetere il comportamento 2: inseguimento del bordo (boundary following)**
+**Ripetere il comportamento 2: boundary following**
 
 1. Calcolare i punti di discontinuità $O_k$ e le distanze $d_{\text{reach}}$ e $d_{\text{followed}}$.
 2. Seguire il bordo mantenendo la stessa direzione di percorrenza adottata in precedenza.
